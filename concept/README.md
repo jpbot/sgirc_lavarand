@@ -8,8 +8,10 @@ hashed with the *SHA1* algorithim using openssl.
 
 The output is 7 SHA1 digests concatenated, (160 bits * 7) 1120 bits.
 
-This implementation takes a bit over six seconds on my O2, a far cry from the approximate
-9000 bits/sec of seed data according to the lavarand website.
+This implementation takes about 4.5 seconds on my O2, a far cry from the approximate
+9000 bits/sec of seed data according to the lavarand website. Side note, the screen
+saver runs even when the monitor has been set to powersave and can slow down run time
+33% in the case of ElectroPaint.
 
 `1n.c` is pretty slow, but using `dmconvert` to convert the sgi rgb file to raw rgb is
 a big time consumer.
@@ -28,9 +30,9 @@ ouput len 131657
 ouput len 131657
 92071488d8ac265081b1250482d20c6dd4919de6b3af36a33941bfa293579ae30e5c412809f34a46fcaae5f0215aec647a634d396765895537174ef3fa2a7f6ce90b608b571aa7f6c951248768657e43ab8d8379d87dce72703f19e1e9fcac9fcb38304a11332665e31b0899286b74af994cc4742aef0e03c5277be68966807c9e29e90aca1f3adf897919d2
 
-real        6.20
-user        1.20
-sys         0.76
+real        4.55
+user        1.17
+sys         0.77
 ```
 
 \
