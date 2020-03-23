@@ -44,8 +44,7 @@ int main(int argc, char **argv){
       exit(-1);
    }
 
-   buffer = malloc(MAXBUFFER + 1);
-   buffer[MAXBUFFER] = 0;
+   buffer = malloc(filelen);
 
    if(!buffer){
       fprintf(stderr, "ERROR: allocating buffer\n");
