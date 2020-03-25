@@ -14,23 +14,18 @@
     UPDATE: only 2.26 seconds, 3.72 seconds was with file writing. ~4950 bits/sec
  */
 
-#include <errno.h>
-#include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <gl/gl.h>
 #include <dmedia/vl.h>
 #include "sha1/shs1.h"
-
 
 const int BYTES_PER_ARGB_PIXEL = 4;
 const int BYTES_PER_PIXEL = 3;
 const int FRAME_COUNT = 10;
 
 char *_progName;
-int exit_val;
 
 void multiTest(void){ return; }
 
@@ -270,7 +265,6 @@ main(int argc, char **argv)
     char *dataPtr;
     char *dataBuffer;
     char *dataBufferEnd;
-    FILE *outFile;
     int c;
     int xsize;
     int ysize;
@@ -325,43 +319,32 @@ main(int argc, char **argv)
     if (vlBeginTransfer(svr, path, 0, NULL))
 	error_exit();
     
-    outFile = fopen("out.seed", "w");
-    if (outFile) {
-        for(c = 0; c < FRAME_COUNT; c++){
-            char *dst = dataBuffer;
-
-            do {
-    	        sginap(1);		/* wait a tick */
-	        info = vlGetNextValid(svr, buffer);
-            } while (!info);
-      
-	    /* Get a pointer to the frame */
-	    dataPtr = vlGetActiveRegion(svr, buffer, info);
-
-            /* Skip alpha channel */
-            dataPtr++;
-
-            /* In memory copy of RGB data */
-            for(; dst < dataBufferEnd; dst += BYTES_PER_PIXEL){
-                memcpy(dst, dataPtr, BYTES_PER_PIXEL);
-                dataPtr += BYTES_PER_ARGB_PIXEL;
-            }
+    for(c = 0; c < FRAME_COUNT; c++){
+        char *dst = dataBuffer;
     
-            /* Finished with frame, unlock the buffer */
-    	    vlPutFree(svr, buffer);
-
-            /* Write data to file */
-            //fwrite(dataBuffer, xsize * BYTES_PER_PIXEL, ysize, outFile);
-            
-            multiSha1(NULL, 0, dataBuffer, frameSizeBytes, 1, 7);    
+        do {
+            sginap(1);		/* wait a tick */
+        info = vlGetNextValid(svr, buffer);
+        } while (!info);
+    
+    /* Get a pointer to the frame */
+    dataPtr = vlGetActiveRegion(svr, buffer, info);
+    
+        /* Skip alpha channel */
+        dataPtr++;
+    
+        /* In memory copy of RGB data */
+        for(; dst < dataBufferEnd; dst += BYTES_PER_PIXEL){
+            memcpy(dst, dataPtr, BYTES_PER_PIXEL);
+            dataPtr += BYTES_PER_ARGB_PIXEL;
         }
-
-        fclose(outFile);
-    } else {
-        fprintf(stderr, "can't open file: out.seed (%d)\n", errno );
-        perror(_progName);
-        exit_val = errno;
+    
+        /* Finished with frame, unlock the buffer */
+        vlPutFree(svr, buffer);
+    
+        multiSha1(NULL, 0, dataBuffer, frameSizeBytes, 1, 7);    
     }
+
 
     /* End the data transfer */
     vlEndTransfer(svr, path);
@@ -371,6 +354,4 @@ main(int argc, char **argv)
     vlDestroyBuffer(svr, buffer);
     vlDestroyPath(svr, path);
     vlCloseVideo(svr);
-
-    exit(exit_val);
 }
