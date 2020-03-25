@@ -7,6 +7,7 @@
 #include <gl/gl.h>
 #include <dmedia/vl.h>
 
+const int BYTES_PER_ARGB_PIXEL = 4;
 const int BYTES_PER_PIXEL = 3;
 const int FRAME_COUNT = 1;
 
@@ -106,8 +107,8 @@ main(int argc, char **argv)
 
             /* In memory copy of RGB data */
             for(; dst < dataBufferEnd; dst += BYTES_PER_PIXEL){
-                memcpy(dst, dataPtr, 3);
-                dataPtr += 4;
+                memcpy(dst, dataPtr, BYTES_PER_PIXEL);
+                dataPtr += BYTES_PER_ARGB_PIXEL;
             }
     
             /* Finished with frame, unlock the buffer */
@@ -119,7 +120,7 @@ main(int argc, char **argv)
 
         fclose(outFile);
     } else {
-        fprintf(stderr, "can't open file: seed (%d)\n", errno );
+        fprintf(stderr, "can't open file: out.seed (%d)\n", errno );
         perror(_progName);
         exit_val = errno;
     }
